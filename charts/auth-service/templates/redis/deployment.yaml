@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: auth-cache-{{ .Release.Name }}
+  labels:
+    app: auth-cache-{{ .Release.Name }}
+spec:
+  serviceName: auth-cache-{{ .Release.Name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-cache-{{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: auth-cache-{{ .Release.Name }}
+    spec:
+      containers:
+        - name: auth-cache
+          image: {{ .Values.redis.image }}
+          ports:
+            - containerPort: 6379
+              name: cache-port
+          volumeMounts:
+            - name: cache-data
+              mountPath: /data
+      dnsPolicy: ClusterFirst
+  volumeClaimTemplates:
+    - metadata:
+        name: cache-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.redis.storage }}

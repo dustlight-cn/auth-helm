@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-cache-{{ .Release.Name }}
+  labels:
+    app: auth-cache-{{ .Release.Name }}
+spec:
+  ports:
+    - port: 6379
+      name: cache-port
+  selector:
+    app: auth-cache-{{ .Release.Name }}

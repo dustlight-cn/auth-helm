@@ -1,0 +1,10 @@
+
+mysql:
+  image: "mysql:8.0.28"
+  password: "123456"
+  database: "auth"
+  storage: 10Gi
+
+redis:
+  image: "redis:latest"
+  storage: 10Gi

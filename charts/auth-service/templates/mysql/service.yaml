@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-database-{{ .Release.Name }}
+  labels:
+    app: auth-database-{{ .Release.Name }}
+spec:
+  ports:
+    - port: 3306
+      name: db-port
+  selector:
+    app: auth-database-{{ .Release.Name }}

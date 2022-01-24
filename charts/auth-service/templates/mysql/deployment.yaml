@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: auth-database-{{ .Release.Name }}
+  labels:
+    app: auth-database-{{ .Release.Name }}
+spec:
+  serviceName: auth-database-{{ .Release.Name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-database-{{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: auth-database-{{ .Release.Name }}
+    spec:
+      containers:
+        - name: auth-database
+          image: {{ .Values.mysql.image | quote }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.password }}
+          ports:
+            - containerPort: 3306
+              name: db-port
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-initdb
+              mountPath: /docker-entrypoint-initdb.d
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: mysql-initdb
+          configMap:
+            name: auth-database-config-{{ .Release.Name }}
+            items:
+              - key: initdb.sql
+                path: initdb.sql
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.mysql.storage }}
