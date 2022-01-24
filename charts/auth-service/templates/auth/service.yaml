@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-{{ .Release.Name }}
+  labels:
+    app: auth-service-{{ .Release.Name }}
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: auth-port
+  selector:
+    app: auth-service-{{ .Release.Name }}
+  type: ClusterIP

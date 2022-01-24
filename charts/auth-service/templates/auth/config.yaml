@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config-{{ .Release.Name }}
+data:
+  application.yaml: |-
+    mysql:
+      host: auth-database-{{ .Release.Name }}
+      port: 3306
+      db: {{ .Values.mysql.database | quote }}
+      charset: "utf8"
+      ssl: false
+      username: "root"
+      password: {{ .Values.mysql.password | quote }}
+      allowPublicKeyRetrieval: true
+    redis:
+      host: auth-cache-{{ .Release.Name }}
+      port: 6379
+      password: ""
+    {{ if .Values.smtp.enabled }}
+    smtp:
+      host: {{ .Values.smtp.host | quote }}
+      user: {{ .Values.smtp.username | quote }}
+      pass: {{ .Values.smtp.password | quote }}
+    {{ end }}
+    
+    dustlight:
+      auth:
+        captcha:
+          enabled: {{ .Values.captcha.enabled }}
+        storage:
+          prefix: {{ .Values.storage.prefix | quote }}
+    {{ if eq .Values.storage.type "local" }}
+          storage-type: local
+    {{ else }}
+          storage-type: storage
+          base-url: {{ .Values.storage.baseUrl | quote }}
+          simple-mode: {{ .Values.storage.simpleMode }}
+          default-expiration: {{ .Values.storage.defaultExpiration }}
+    {{ end }}
+        service:
+          pattern:
+            username: {{ .Values.pattern.username | quote }}
+            email: {{ .Values.pattern.email | quote }}
+            password: {{ .Values.pattern.password | quote }}
+            phone: {{ .Values.pattern.phone | quote }}
+        jwt:
+          signing-key: {{ .Values.jwt.signingKey | quote  }}
+          verifier-key: {{ .Values.jwt.verifierKey |quote }}
+      # 验证码配置，详情请参考：https://github.com/dustlight-cn/captcha
+      captcha:
+        default:
+          store:
+            name: redisCodeStore
+        recaptcha:
+          default-secret: {{ .Values.captcha.recaptcha.secret | quote }}
+          default-parameter-name: {{ .Values.captcha.recaptcha.parameterName | quote }}
+        generator:
+          random-string:
+            chars: {{ .Values.captcha.chars }}
+            length: {{ .Values.captcha.length }}
+        sender:
+    {{ if eq .Values.sms.type "tencent" }}
+          tencent:
+            sms:
+              secret-id: {{ .Values.sms.tencent.secretId | quote }}
+              secret-key: {{ .Values.sms.tencent.secretKey | quote }}
+              default-app-id: {{ .Values.sms.tencent.appId | quote }}
+              default-sign: myDefaultName
+              signs:
+                myDefaultName: {{ .Values.sms.sign | quote }}
+              template-ids:
+                signup: {{ .Values.sms.templates.signUp }}
+                changePhone: {{ .Values.sms.templates.changePhone }}
+                resetPassword: {{ .Values.sms.templates.resetPassword }}
+    {{ else if eq .Values.sms.type "alibaba" }}
+          alibaba:
+            sms:
+              access-key-id: {{ .Values.sms.alibaba.accessKeyId | quote }}
+              access-key-secret: {{ .Values.sms.alibaba.secretAccessKey | quote }}
+              default-template-code: signup
+              default-sign-name: myDefaultName
+              sign-names:
+                myDefaultName: {{ .Values.sms.sign | quote }}
+              template-codes:
+                signup: {{ .Values.sms.templates.signUp | quote }}
+                changePhone: {{ .Values.sms.templates.changePhone | quote }}
+                resetPassword: {{ .Values.sms.templates.resetPassword | quote }}
+    {{ end }}
+        verifier:
+          string-equals:
+            trim: true
+      # 对象存储配置，详情请参考：https://github.com/dustlight-cn/storage
+      storage:
+    {{ if eq .Values.storage.type "alibaba" }}
+        alibaba:
+          oss:
+            access-key-id: {{ .Values.storage.alibaba.accessKeyId  | quote }}
+            secret-access-key: {{ .Values.storage.alibaba.secretAccessKey  | quote }}
+            bucket: {{ .Values.storage.alibaba.bucket  | quote }}
+            endpoint: {{ .Values.storage.alibaba.endpoint  | quote }}
+    {{ else if eq .Values.storage.type "tencent" }}
+        tencent:
+          cos:
+            secret-key: {{ .Values.storage.tencent.secretKey  | quote }}
+            secret-id: {{ .Values.storage.tencent.secretId  | quote }}
+            bucket: {{ .Values.storage.tencent.bucket  | quote }}
+            region: {{ .Values.storage.tencent.region  | quote }}
+    {{ end }}
+
+    spring:
+      application:
+        name: auth-service-{{ .Release.Name }}
+      cloud:
+        kubernetes:
+          config:
+            name: auth-service-config-{{ .Release.Name }}
+          reload:
+            enabled: true # 是否监听 Kubernetes 配置更改
+      datasource:
+        url: jdbc:mysql://${mysql.host:localhost}:${mysql.port:3306}/${mysql.db}?characterEncoding=${mysql.charset:utf8}&useSSL=${mysql.ssl:false}&allowPublicKeyRetrieval=${mysql.allowPublicKeyRetrieval:true}
+        username: ${mysql.username}
+        password: ${mysql.password}
+        hikari:
+          connection-timeout: 30000
+          idle-timeout: 600000
+          max-lifetime: 1800000
+          maximum-pool-size: 8  # 数据库连接池最大连接数
+          minimum-idle: 2       # 数据库连接池最小连接数
+        initialization-mode: always   # 启动时是否自动建表以及导入默认数据
+        schema: classpath:scheme.sql
+        data: classpath:data.sql
+      redis:
+        host: ${redis.host}
+        port: ${redis.port}
+        password: ${redis.password}
+      mail:
+        host: ${smtp.host:smtp.exmail.qq.com} # SMTP 服务器地址
+        username: ${smtp.user}                # SMTP 用户名
+        password: ${smtp.pass}                # SMTP 密码
+      mvc:
+        throw-exception-if-no-handler-found: true
+      resources:
+        add-mappings: false
+
+    springdoc:
+      api-docs:
+        path: /v1/api-doc # OpenAPI 路径
+      swagger-ui:
+        path: /v1/swagger-ui # Swagger UI 路径
+
+    logging:
+      level:
+        cn.dustlight.auth: {{ .Values.logging }}
