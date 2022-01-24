@@ -20,7 +20,7 @@ spec:
           image: {{ .Values.mysql.image | quote }}
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: {{ .Values.mysql.password }}
+              value: {{ .Values.mysql.password | quote }}
           ports:
             - containerPort: 3306
               name: db-port
