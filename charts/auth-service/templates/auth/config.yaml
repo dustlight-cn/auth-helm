@@ -57,7 +57,7 @@ data:
           default-parameter-name: {{ .Values.captcha.recaptcha.parameterName | quote }}
         generator:
           random-string:
-            chars: {{ .Values.captcha.chars }}
+            chars: {{ .Values.captcha.chars | quote }}
             length: {{ .Values.captcha.length }}
         sender:
     {{ if eq .Values.sms.type "tencent" }}
