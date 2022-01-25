@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-ui-{{ .Release.Name }}
+  labels:
+    app: auth-ui-{{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-ui-{{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: auth-ui-{{ .Release.Name }}
+    spec:
+      containers:
+        - name: auth-ui
+          image: {{ .Values.image | quote }}
+          env:
+            - name: API_BACKEND
+              value: http{{ if .Values.service.https }}s{{ end }}://{{ .Values.service.host }}
+          ports:
+            - containerPort: 80
+              name: auth-ui-port
+      initContainers:
+        - name: init-service
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: [ 'sh', '-c', "until nc -z {{ .Values.service.host }} {{ if .Values.service.https }}443{{ else }}80{{ end }}; do echo waiting for auth-service; sleep 2; done" ]

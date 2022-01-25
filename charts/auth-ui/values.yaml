@@ -1,0 +1,17 @@
+
+image: "dustlightcn/auth-ui:1.1.1-alpha-1"
+
+replicaCount: 1
+
+service:
+  https: false
+  host: "api.dustlight.cn"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "accounts.dustlight.cn"
+  tls:
+    enabled: false
+    crt: ""
+    key: ""
