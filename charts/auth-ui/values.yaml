@@ -5,7 +5,7 @@ replicaCount: 1
 
 service:
   https: false
-  host: "api.dustlight.cn"
+  host: "auth-service-my-auth" # 后端服务名
 
 ingress:
   enabled: true
