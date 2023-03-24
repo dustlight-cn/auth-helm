@@ -3,6 +3,16 @@ entries:
   auth-service:
   - apiVersion: v2
     appVersion: 1.1.1-alpha-1
+    created: "2023-03-24T16:32:37.326292184Z"
+    description: Auth service HELM chart
+    digest: 33695416137bd9a345cc200d7c20041c0b3c20ff542841068fd7c772e2eb62fe
+    name: auth-service
+    type: application
+    urls:
+    - https://github.com/dustlight-cn/auth-helm/releases/download/auth-service-0.1.2/auth-service-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 1.1.1-alpha-1
     created: "2022-01-25T16:14:41.492170976Z"
     description: Auth service HELM chart
     digest: c667d76ae59846e4bb7a9802cd04e8a7e1f7052345bc7fa5ebe63fa1bd824cb1
@@ -24,6 +34,16 @@ entries:
   auth-ui:
   - apiVersion: v2
     appVersion: 1.1.1-alpha-1
+    created: "2023-03-24T16:32:37.473416502Z"
+    description: Auth UI HELM chart
+    digest: 8f313f3cd50f01b48a361e83d740f1c5c6330d4caa8ba697dc28583a676a9edf
+    name: auth-ui
+    type: application
+    urls:
+    - https://github.com/dustlight-cn/auth-helm/releases/download/auth-ui-0.1.1/auth-ui-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.1.1-alpha-1
     created: "2022-01-25T10:12:25.084337605Z"
     description: Auth UI HELM chart
     digest: aaebcafb73a47db5086c37dd0e441f4b0a048b4653f3f80e08caad25086c4511
@@ -32,4 +52,4 @@ entries:
     urls:
     - https://github.com/dustlight-cn/auth-helm/releases/download/auth-ui-0.1.0/auth-ui-0.1.0.tgz
     version: 0.1.0
-generated: "2022-01-25T16:14:41.492178676Z"
+generated: "2023-03-24T16:32:37.473439303Z"
